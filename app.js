@@ -5,6 +5,7 @@ var mongoose = require("mongoose");
 var cors = require("cors");
 require("dotenv").config();
 var passwordHash = require("password-hash");
+const bearerToken = require('express-bearer-token');
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -18,6 +19,7 @@ var port = 3200;
 
 // view engine setup
 
+app.use(bearerToken())
 app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());

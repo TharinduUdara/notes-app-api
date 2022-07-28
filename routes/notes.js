@@ -1,12 +1,16 @@
 var express = require("express");
 var router = express.Router();
 var Notes = require("../models/note-model");
+var jwt = require("jsonwebtoken");
 
 // Create a Notes
 router.post("/", async function (req, res, next) {
+  const decoded = jwt.decode(req.token);
+
   const newNote = new Notes({
     title: req.body.title,
     description: req.body.description,
+    userId: decoded.id,
   });
 
   await newNote.save();
@@ -17,10 +21,11 @@ router.post("/", async function (req, res, next) {
   });
 });
 
-
 // get all Notes
 router.get("/", async function (req, res, next) {
-  const allNotes = await Notes.find();
+  const decoded = jwt.decode(req.token);
+
+  const allNotes = await Notes.find({ userId: decoded.id });
 
   res.json({
     success: true,
@@ -34,7 +39,7 @@ router.get("/:noteId", async function (req, res, next) {
 
   res.json({
     success: true,
-    data: note,
+    data: notes,
   });
 });
 
@@ -44,11 +49,12 @@ router.put("/:noteId", async function (req, res, next) {
     title: req.body.title,
     description: req.body.description,
   };
-  const notes = await Notes.findByIdAndUpdate(req.params.noteId, newData);
+  await Notes.findByIdAndUpdate(req.params.noteId, newNote);
 
   res.json({
     success: true,
     data: note,
+    userId: decoded.id,
   });
 });
 
